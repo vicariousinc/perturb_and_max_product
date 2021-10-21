@@ -1,0 +1,11 @@
+cvxpy
+jax
+jaxlib
+joblib
+matplotlib
+numpy
+scipy
+setuptools
+sklearn
+tqdm
+tensorflow
