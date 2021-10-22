@@ -36,6 +36,7 @@ def train_rbm(learn_iter, sampling_alg, seed, reset_chain_on_iter=False, n_steps
             learn_iter=learn_iter,
             eta=0.01,
             use_adam=True,  # changed
+            seed=seed
         )
     else:
         W, bv, bh, convergence, S = learn(
