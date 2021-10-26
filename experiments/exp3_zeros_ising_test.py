@@ -64,7 +64,7 @@ def test_ising(learn_iter, sampling_alg, seed, n_steps=50, n_samples=100):
 
 
 if __name__ == "__main__":
-    learn_iter = int(sys.argv[1])  # run with 200
+    learn_iter = int(sys.argv[1])  # run with 1000
     seed = int(sys.argv[2])  # 40 to 44
     folder = os.path.join(os.path.dirname(__file__), "../results/zeros_ising")
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     # Finish with LP which does not have steps
     S2, logmmd, W, b = test_ising(
-        learn_iter,
+        200,
         "pmap_lp",
         seed,
     )

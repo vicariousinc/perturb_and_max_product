@@ -45,7 +45,7 @@ def train_ising(
         W, b, S2 = learn_lp(
             muS,
             covS,
-            learn_iter=learn_iter,
+            learn_iter=200,
             eta=0.01,
             n_samples=n_samples,
             use_adam=True,
@@ -58,7 +58,7 @@ def train_ising(
             muS,
             covS,
             learn_iter=learn_iter,
-            eta=0.01,
+            eta=0.001,
             n_samples=n_samples,
             n_steps=n_steps,
             sampling_alg=sampling_alg,
@@ -71,7 +71,7 @@ def train_ising(
 
 
 if __name__ == "__main__":
-    learn_iter = int(sys.argv[1]) # run with 200
+    learn_iter = int(sys.argv[1]) # run with 1000
     seed = int(sys.argv[2])  # run with 40 to 44
     n_steps = 50
 
