@@ -5,7 +5,6 @@ import ecos
 from tqdm import trange
 from scipy.sparse import save_npz, load_npz
 from joblib import Parallel, delayed, cpu_count
-from pmap.ising_modeling import stob
 
 
 #####################################
@@ -41,37 +40,6 @@ def learn_lp(
             b = adam(b, v_b, sqrt_b, grad_b, eta, it + 1)
             W = adam(W, v_W, sqrt_W, grad_W, eta, it + 1)
     return W, b, S
-
-
-def learn_single_param_lp(
-    muX,
-    covX,
-    learn_iter=100,
-    eta=0.1,
-    n_samples=100,
-    seed=0,
-    n_jobs=None
-):
-    np.random.seed(seed)
-
-    # Only used for Section 5.1
-    # Learn an Ising model in {-1, 1} with energy E(x) = -theta * \sum_{i<j} x_i x_j
-    d = muX.shape[0]
-    theta = np.array([0.0])
-    v_theta, sqrt_theta = np.zeros_like(theta), np.zeros_like(theta)
-
-    for it in range(learn_iter):
-        W, b = .5 * theta * np.ones((d, d)), np.zeros((d, 1))
-        np.fill_diagonal(W, 0)
-        # Map to data in {0, 1} and E2
-        W, b = stob(W, b)
-
-        # Gradient step
-        grad_W, grad_b, S, objvals = grad_lp(W, b, muX, covX, n_samples, signed=False, n_jobs=n_jobs)
-        gtheta = np.array([2 * grad_W.sum() - 6 * grad_b.sum()])
-
-        theta = adam(theta, v_theta, sqrt_theta, gtheta, eta, it + 1)
-    return float(theta)
 
 
 #####################################
