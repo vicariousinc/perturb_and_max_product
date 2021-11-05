@@ -1,6 +1,6 @@
 # Perturb-and-max-product: Sampling and learning in discrete energy-based models
 
-This repo contains code for reproducing the results in the paper [Sample-Efficient L0-L2 Constrained Structure Learning of Sparse Ising Models](https://arxiv.org/abs/2012.01744) published at the 35th AAAI Conference on Artificial Intelligence (AAAI 2021).
+This repo contains code for reproducing the results in the paper [Perturb-and-max-product: Sampling and learning in discrete energy-based models](https://arxiv.org/abs/2111.02458) accepted at the 35th Conference on Neural Information Processing Systems (NeurIPS 2021).
 
 
 ## Getting started
