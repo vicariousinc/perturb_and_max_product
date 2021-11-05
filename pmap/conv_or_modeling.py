@@ -1,12 +1,12 @@
 # Sampling convolutional OR layers  with Gibbs, GWG, PMAP
 
-import jax
 from jax import grad, jit
 from jax import numpy as jnp
 from jax import random, vmap
 from jax.lax import dynamic_slice, dynamic_update_slice, pad, scan
 from jax.nn import log_softmax
 from jax.scipy.special import logit as invsigmoid
+from functools import partial
 from pmap.logical_mpmp import and_bwd, and_fwd, or_fwd
 
 
@@ -57,7 +57,7 @@ def or_layer(S, W):
 #####################################
 
 # Parallel max-product
-@jax.partial(jit, static_argnums=(3,))  # jit with axis being static
+@partial(jit, static_argnums=(3,))  # jit with axis being static
 def min_energy(uX, uS, uW, n_steps):
     mp_step = 0.5
     n_samples, n_chan, im_height, im_width = uX.shape
@@ -183,14 +183,13 @@ def incoming_s(Mout_s, uS):
     Min_s = vmap(vmap(update_Min, (None, None, 0)), (None, 0, None))(
         bel_s, jnp.arange(feat_height), jnp.arange(feat_width)
     ).transpose((2, 3, 4, 5, 6, 0, 1))
-
     return (
         Min_s,
         bel_s.transpose((0, 3, 1, 2))[
             :,
             :,
-            feat_height - 1 : -(feat_height - 1),
-            feat_width - 1 : -(feat_width - 1),
+            feat_height - 1 : im_height,
+            feat_width - 1 : im_width,
         ],
     )
 
@@ -199,7 +198,7 @@ def incoming_s(Mout_s, uS):
 ######## Gibbs-with-gradient ########
 #####################################
 
-@jax.partial(jit, static_argnums=(2, 3))  # jit with axis being static
+@partial(jit, static_argnums=(2, 3))  # jit with axis being static
 def _gwg_co(X, sw, Wshape, n_steps, rng):
     def delta(sw):
         return -(2 * sw - 1) * glogprob(X, sw, Wshape)
@@ -227,7 +226,7 @@ def _gwg_co(X, sw, Wshape, n_steps, rng):
     return sw, convergence
 
 
-@jax.partial(jit, static_argnums=(3,))
+@partial(jit, static_argnums=(3,))
 def gwg_co(X, S, W, n_steps, rng=random.PRNGKey(42)):
     sw = jnp.hstack((S.ravel(), W.ravel()))
     sw, convergence = _gwg_co(X, sw, W.shape, n_steps, rng)
@@ -240,7 +239,7 @@ def gwg_co(X, S, W, n_steps, rng=random.PRNGKey(42)):
 # log p(y=0) = sum_i log(1-exp(log(si)+log(wi)))
 
 
-@jax.partial(jit, static_argnums=(2,))  # jit with axis being static
+@partial(jit, static_argnums=(2,))  # jit with axis being static
 def sw_to_S_W(X, sw, Wshape):
     n_chan, n_feat, feat_height, feat_width = Wshape
     n_samples, n_chan, im_height, im_width = X.shape
@@ -253,7 +252,7 @@ def sw_to_S_W(X, sw, Wshape):
     return S, W
 
 
-@jax.partial(jit, static_argnums=(2,))  # jit with axis being static
+@partial(jit, static_argnums=(2,))  # jit with axis being static
 def logprob_flat(X, sw, Wshape):
     pW = 0.15
     pS = 0.05

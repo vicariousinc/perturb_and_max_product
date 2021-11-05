@@ -1,6 +1,5 @@
 # Learning and sampling for RBM models
 
-import jax
 import numpy as np
 from jax import jit
 from jax import numpy as jnp
@@ -11,6 +10,7 @@ from jax.lax import scan
 from jax.nn import sigmoid, softplus
 from jax.scipy.special import logsumexp
 from tqdm import trange
+from functools import partial
 
 from .mmd import logMMD
 
@@ -101,7 +101,7 @@ def learn(
 ############## Sampling #############
 #####################################
 
-@jax.partial(jit, static_argnums=(4, 5))  # jit with axis being static
+@partial(jit, static_argnums=(4, 5))  # jit with axis being static
 def grad(W, bv, bh, X, n_steps, sampling_alg, rng=random.PRNGKey(42), S=None):
     n_samples = X.shape[0]
 
@@ -141,7 +141,7 @@ def grad_from_samples(W, bh, X):
     return Z, zv, zh
 
 
-@jax.partial(jit, static_argnums=(3, 4, 5))  # jit with axis being static
+@partial(jit, static_argnums=(3, 4, 5))  # jit with axis being static
 def sample(W, bv, bh, n_samples, n_steps, sampling_alg, rng=random.PRNGKey(42), S=None):
     nh = bh.shape[1]
     nv = bv.shape[1]
@@ -179,7 +179,7 @@ def sample(W, bv, bh, n_samples, n_steps, sampling_alg, rng=random.PRNGKey(42), 
 #####################################
 
 
-@jax.partial(jit, static_argnums=(4,))  # jit with axis being static
+@partial(jit, static_argnums=(4,))  # jit with axis being static
 def gibbs(W, bh, bv, rng, n_steps, S):
     nh, nv = W.shape
     n_samples, _ = bh.shape
@@ -236,7 +236,7 @@ def gibbs(W, bh, bv, rng, n_steps, S):
 ############## Max-product ##########
 #####################################
 
-@jax.partial(jit, static_argnums=(3,))  # jit with axis being static
+@partial(jit, static_argnums=(3,))  # jit with axis being static
 def min_energy(W, bh, bv, n_steps):
     # Max-product for RBM with binary variables
     mp_step = 0.5

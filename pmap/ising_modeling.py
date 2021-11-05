@@ -9,6 +9,7 @@ from jax.experimental import optimizers
 from jax.lax import dynamic_slice, dynamic_update_slice, scan
 from jax.nn import log_softmax, sigmoid
 from tqdm import trange
+from functools import partial
 
 from .mmd import logMMD
 
@@ -197,7 +198,7 @@ def btos(W, b):
     return W, b
 
 
-@jax.partial(jit, static_argnums=(4, 5, 6, 7))  # jit with axis being static
+@partial(jit, static_argnums=(4, 5, 6, 7))  # jit with axis being static
 def grad(
     W,
     b,
@@ -236,7 +237,7 @@ def grad(
 ############# Sampling ##############
 #####################################
 
-@jax.partial(jit, static_argnums=(2, 3, 4))  # jit with axis being static
+@partial(jit, static_argnums=(2, 3, 4))  # jit with axis being static
 def sample(W, b, n_samples, n_steps, sampling_alg, rng=random.PRNGKey(42), S=None):
     # Sample from an Ising model
     d = W.shape[0]
@@ -271,7 +272,7 @@ def sample(W, b, n_samples, n_steps, sampling_alg, rng=random.PRNGKey(42), S=Non
 ############## Gibbs ################
 #####################################
 
-@jax.partial(jit, static_argnums=(3,))  # jit with axis being static
+@partial(jit, static_argnums=(3,))  # jit with axis being static
 def gibbs_ising(W, b, S, n_steps, rng=random.PRNGKey(42)):
     # Vectorization of gibbs sampling for Ising model
     S, i = S
@@ -315,14 +316,14 @@ def gibbs_ising(W, b, S, n_steps, rng=random.PRNGKey(42)):
 ######## Gibbs-with-gradient #########
 #####################################
 
-@jax.partial(jit, static_argnums=(3,))  # jit with axis being static
+@partial(jit, static_argnums=(3,))  # jit with axis being static
 def gwg_ising(W, b, S, n_steps, rng=random.PRNGKey(42)):
     # Gibbs with gradient for Ising model
     rng = random.split(rng, S.shape[0])
     return vmap(gwg_ising1, in_axes=(None, None, 0, None, 0))(W, b, S, n_steps, rng)
 
 
-@jax.partial(jit, static_argnums=(3,))  # jit with axis being static
+@partial(jit, static_argnums=(3,))  # jit with axis being static
 def gwg_ising1(W, b, s, n_steps, rng):
     def update_gibbs(gsrng, _):
         g, s, rng = gsrng
@@ -359,7 +360,7 @@ def gwg_ising1(W, b, s, n_steps, rng):
 #####################################
 
 # Parallel max-product
-@jax.partial(jit, static_argnums=(2, 3))  # jit with axis being static
+@partial(jit, static_argnums=(2, 3))  # jit with axis being static
 def min_energy1(W, b, n_steps, sampling_alg="pmap"):
     mp_step = 0.5
     d = W.shape[0]
