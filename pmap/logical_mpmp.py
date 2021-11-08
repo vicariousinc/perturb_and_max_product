@@ -1,4 +1,4 @@
-# Messages updates for OR and AND pools
+# Messages updates for OR and AND factors
 
 from jax import jit
 from jax import numpy as jnp
@@ -7,8 +7,8 @@ from jax import vmap
 
 @jit
 def _or_fwd(t_in, b_in):  # 1D version
-    # Message from bottom of OR pool to top
-    # OR pool is of form:
+    # Message from bottom of OR factor to top
+    # OR factor is of form:
     # t1   t2   t3   t4
     # |    |    |    |
     #  \   |    |    /
@@ -46,8 +46,8 @@ or_fwd = vmap(_or_fwd, in_axes=(0, 0))  # 2D version
 
 @jit
 def _or_bwd(t_in):  # 1D version
-    # Message from top of OR pool to bottom
-    # OR pool is of form:
+    # Message from top of OR factor to bottom
+    # OR factor is of form:
     # t1   t2   t3   t4
     # |    |    |    |
     #  \   |    |    /
@@ -67,8 +67,8 @@ or_bwd = vmap(_or_bwd)  # 2D version
 
 @jit
 def _and_fwd(t_in0, t_in1, b_in):  # 1D version
-    # Message from bottom of AND pool to top
-    # AND pool is of form:
+    # Message from bottom of AND factor to top
+    # AND factor is of form:
     # t1     t2
     #   \   /
     #     F
@@ -88,8 +88,8 @@ and_fwd = vmap(_and_fwd, in_axes=(0, 0, 0))  # 2D version
 
 @jit
 def _and_bwd(t_in0, t_in1):  # 1D version
-    # Message from top of AND pool to bottom
-    # AND pool is of form:
+    # Message from top of AND factor to bottom
+    # AND factor is of form:
     # t1     t2
     #   \   /
     #     F
