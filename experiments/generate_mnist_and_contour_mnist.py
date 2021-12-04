@@ -5,7 +5,7 @@ import os
 
 import numpy as np
 from scipy.ndimage.morphology import binary_dilation
-from tensorflow.keras.datasets import mnist
+from sklearn.datasets import fetch_openml
 
 
 def contour_mnist(X):
@@ -29,7 +29,10 @@ if __name__ == "__main__":
         os.makedirs(data_folder, exist_ok=True)
 
     # Get MNIST dataset
-    (X_train, y_train), (X_test, y_test) = mnist.load_data()
+    X, y = fetch_openml("mnist_784", version=1, return_X_y=True)
+    y = y.astype(np.uint8)
+    X_train, X_test = X[:60000].reshape(-1, 28, 28), X[60000:].reshape(-1, 28, 28)
+    y_train, y_test = y[:60000], y[60000:]
     X_train = X_train / 255.0
     X_test = X_test / 255.0
 

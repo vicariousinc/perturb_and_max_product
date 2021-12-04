@@ -9,4 +9,3 @@ scipy
 setuptools
 sklearn
 tqdm
-tensorflow
